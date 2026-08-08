@@ -17,8 +17,8 @@ public class EnrichmentServiceTest {
     @Test
     public void testLocalIpEnrichment() {
         EnrichmentService.EnrichedIpData data = enrichmentService.enrichIp("127.0.0.1");
-        assertEquals("Local", data.country);
-        assertEquals("Local", data.city);
+        assertEquals("Local Network (Internal)", data.country);
+        assertEquals("Local Network (Internal)", data.city);
         assertEquals(0.0, data.latitude);
         assertEquals(0.0, data.longitude);
         assertEquals(0, data.threatScore);

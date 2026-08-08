@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface AttackLogRepository extends JpaRepository<AttackLog, Long> {
     int countByIpAddressAndTimestampAfter(String ipAddress, LocalDateTime timestamp);
+    int countByIpAddressAndEndpointAndTimestampAfter(String ipAddress, String endpoint, LocalDateTime timestamp);
 
     // NOTE: Spring Data JPA (the version pulled in by Spring Boot 3.2.3) does not
     // reliably convert aliased @Query projections into List<Map<String,Object>> -

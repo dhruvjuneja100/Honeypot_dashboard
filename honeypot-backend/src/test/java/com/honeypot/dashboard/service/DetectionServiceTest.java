@@ -27,7 +27,7 @@ public class DetectionServiceTest {
     public void testSqlInjectionDetection() {
         String payload = "username=admin' OR 1=1 --";
         String result = detectionService.classifyAttack("127.0.0.1", "/login", payload);
-        assertEquals("SQL Injection", result);
+        assertEquals("SQL_INJECTION", result);
     }
 
     @Test
@@ -41,28 +41,28 @@ public class DetectionServiceTest {
     public void testPathTraversalDetection() {
         String payload = "file=../../../etc/passwd";
         String result = detectionService.classifyAttack("127.0.0.1", "/api/data", payload);
-        assertEquals("Path Traversal", result);
+        assertEquals("PATH_TRAVERSAL", result);
     }
 
     @Test
     public void testMaliciousUploadDetection() {
         String payload = "filename=shell.php";
         String result = detectionService.classifyAttack("127.0.0.1", "/upload", payload);
-        assertEquals("Malicious File Upload", result);
+        assertEquals("MALICIOUS_UPLOAD", result);
     }
 
     @Test
     public void testBruteForceDetection() {
-        when(attackLogRepository.countByIpAddressAndTimestampAfter(eq("192.168.1.100"), any(LocalDateTime.class)))
+        when(attackLogRepository.countByIpAddressAndEndpointAndTimestampAfter(eq("192.168.1.100"), eq("/login"), any(LocalDateTime.class)))
                 .thenReturn(15);
         
         String result = detectionService.classifyAttack("192.168.1.100", "/login", "user=test");
-        assertEquals("Brute Force", result);
+        assertEquals("BRUTE_FORCE", result);
     }
 
     @Test
     public void testUnknownDetection() {
         String result = detectionService.classifyAttack("10.0.0.1", "/api/data", "param=value");
-        assertEquals("Unknown", result);
+        assertEquals("UNKNOWN", result);
     }
 }

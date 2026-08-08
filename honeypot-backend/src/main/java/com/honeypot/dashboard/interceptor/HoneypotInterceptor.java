@@ -71,6 +71,14 @@ public class HoneypotInterceptor implements HandlerInterceptor {
                 payload += paramPayload;
             }
         }
+        
+        if (payload.isEmpty()) {
+            try {
+                payload = request.getReader().lines().collect(Collectors.joining("\n"));
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
         log.setPayload(payload);
 
         // Classify the attack
