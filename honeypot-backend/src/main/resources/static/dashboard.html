@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honeypot Dashboard – Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { background-color: #0f172a; }
+        #map { height: 420px; z-index: 1; }
+
+        /* ── Sidebar nav ── */
+        .nav-link {
+            display: block;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.15s, color 0.15s;
+            font-size: 0.9rem;
+        }
+        .nav-link:hover:not(.active) { background-color: #334155; color: #e2e8f0; }
+        .nav-link.active            { background-color: #2563eb; color: #ffffff; font-weight: 600; }
+
+        /* ── Custom scrollbar ── */
+        ::-webkit-scrollbar       { width: 7px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300 font-sans h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-60 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700">
+            <h1 class="text-lg font-bold text-blue-400">🛡️ Honeypot UI</h1>
+        </div>
+        <nav class="flex-1 p-3 space-y-1">
+            <a href="/dashboard.html" class="nav-link">📊 Dashboard</a>
+            <a href="/rawlogs.html"   class="nav-link">📋 Raw Logs</a>
+            <a href="/reports.html"   class="nav-link">🚨 Reports &amp; Alerts</a>
+        </nav>
+        <div class="p-4 border-t border-slate-700">
+            <button id="logoutBtn" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg transition-colors text-sm">Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <header class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-8 shrink-0">
+            <h2 class="text-lg font-semibold text-white">Threat Analytics Overview</h2>
+            <span class="flex items-center text-sm text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span> Live
+            </span>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+
+            <!-- Charts row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                    <h3 class="text-base font-medium text-white mb-4">Attack Types Distribution</h3>
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="attackTypesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                    <h3 class="text-base font-medium text-white mb-4">Top 10 Attacking IPs</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="topIpsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                <h3 class="text-base font-medium text-white mb-4">🌍 Global Attack Sources</h3>
+                <div id="map" class="rounded-lg border border-slate-600"></div>
+                <div class="mt-3 flex flex-wrap gap-4 text-xs text-slate-400">
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>SQL Injection</span>
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-orange-400 mr-1"></span>XSS</span>
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-1"></span>Path Traversal</span>
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-purple-500 mr-1"></span>Brute Force</span>
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-slate-900 border border-slate-400 mr-1"></span>Malicious Upload</span>
+                    <span><span class="inline-block w-3 h-3 rounded-full bg-slate-500 mr-1"></span>Other</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

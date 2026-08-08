@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Debug Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#1e1e1e] text-[#d4d4d4] font-mono h-screen p-4 flex flex-col">
+    <div class="mb-4 pb-2 border-b border-[#333]">
+        <h1 class="text-xl font-bold">Diagnostics & Debug Shell v2.4.1</h1>
+        <p class="text-xs text-gray-500">Connected to primary node.</p>
+    </div>
+    
+    <div id="terminal-output" class="flex-grow overflow-auto mb-4 space-y-1 text-sm">
+        <div>> initializing environment... OK</div>
+        <div>> loading kernel modules... OK</div>
+        <div>> ready for input.</div>
+    </div>
+
+    <form id="debugForm" class="flex items-center space-x-2 border-t border-[#333] pt-4">
+        <span class="text-green-500 font-bold">sysadmin@node1:~$</span>
+        <input type="text" id="command" name="command" class="flex-grow bg-transparent border-none focus:outline-none focus:ring-0 text-[#d4d4d4]" autofocus autocomplete="off">
+    </form>
+
+    <script>
+        const output = document.getElementById('terminal-output');
+        document.getElementById('debugForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputField = document.getElementById('command');
+            const cmd = inputField.value;
+            if (!cmd) return;
+
+            // Echo command
+            output.innerHTML += `<div><span class="text-green-500 font-bold">sysadmin@node1:~$</span> ${cmd}</div>`;
+            inputField.value = '';
+
+            const formData = new URLSearchParams();
+            formData.append('command', cmd);
+
+            fetch('/debug', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(response => response.json().catch(() => ({})))
+            .then(data => {
+                output.innerHTML += `<div class="text-red-400">sh: ${data.message || 'command execution blocked'}</div>`;
+                output.scrollTop = output.scrollHeight;
+            })
+            .catch(() => {
+                output.innerHTML += `<div class="text-red-400">sh: connection error</div>`;
+                output.scrollTop = output.scrollHeight;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honeypot Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen bg-slate-900 text-slate-200 font-sans">
+    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-96 border border-slate-700">
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-400">Honeypot Admin</h2>
+        
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium text-slate-400 mb-1">Username</label>
+                <input type="text" id="username" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-400 mb-1">Password</label>
+                <input type="password" id="password" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" required>
+            </div>
+            
+            <div id="errorMessage" class="text-red-400 text-sm hidden text-center">Invalid credentials.</div>
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Login
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const credentials = btoa(user + ':' + pass);
+            
+            try {
+                // Test the credentials against a secured endpoint
+                const res = await fetch('/api/dashboard/attacksByType', {
+                    headers: { 'Authorization': 'Basic ' + credentials }
+                });
+                
+                if (res.ok) {
+                    localStorage.setItem('honeypot_auth', credentials);
+                    window.location.href = '/dashboard.html';
+                } else {
+                    document.getElementById('errorMessage').classList.remove('hidden');
+                }
+            } catch (err) {
+                document.getElementById('errorMessage').classList.remove('hidden');
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('honeypot_auth')) {
+            window.location.href = '/dashboard.html';
+        }
+    </script>
+</body>
+</html>
