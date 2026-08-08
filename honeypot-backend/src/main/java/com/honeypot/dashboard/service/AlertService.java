@@ -39,8 +39,10 @@ public class AlertService {
         AttackLog log = event.getAttackLog();
         
         // Trigger alert for high severity attacks
-        if ("SQL_INJECTION".equals(log.getAttackType()) || "XSS".equals(log.getAttackType()) || 
-            "BRUTE_FORCE".equals(log.getAttackType()) || "MALICIOUS_UPLOAD".equals(log.getAttackType()) ||
+        String attackType = log.getAttackType() != null ? log.getAttackType() : "";
+        if (attackType.contains("SQL_INJECTION") || attackType.contains("XSS") ||
+            attackType.contains("BRUTE_FORCE") || attackType.contains("MALICIOUS_UPLOAD") ||
+            attackType.contains("COMMAND_INJECTION") || attackType.contains("PATH_TRAVERSAL") ||
             (log.getThreatScore() != null && log.getThreatScore() >= 80)) {
             
             // Save to DB

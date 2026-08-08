@@ -37,14 +37,25 @@ public class LoggingService {
     }
 
     private int getBaselineScore(String attackType) {
-        if (attackType == null) return 20;
-        switch (attackType) {
-            case "SQL_INJECTION": return 80;
-            case "BRUTE_FORCE": return 70;
-            case "PATH_TRAVERSAL": return 60;
-            case "MALICIOUS_UPLOAD": return 90;
-            case "XSS": return 65;
-            default: return 20;
+        if (attackType == null || attackType.isEmpty()) return 20;
+
+        int maxScore = 20;
+        String[] types = attackType.split(",\\s*");
+        for (String type : types) {
+            int score = 20;
+            switch (type.trim()) {
+                case "MALICIOUS_UPLOAD": score = 90; break;
+                case "SQL_INJECTION": score = 80; break;
+                case "COMMAND_INJECTION": score = 75; break;
+                case "BRUTE_FORCE": score = 70; break;
+                case "XSS": score = 65; break;
+                case "PATH_TRAVERSAL": score = 60; break;
+                default: score = 20; break;
+            }
+            if (score > maxScore) {
+                maxScore = score;
+            }
         }
+        return maxScore;
     }
 }

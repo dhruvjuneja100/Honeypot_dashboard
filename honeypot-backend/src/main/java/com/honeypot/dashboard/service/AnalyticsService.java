@@ -21,15 +21,16 @@ public class AnalyticsService {
 
     private String formatAttackType(String type) {
         if (type == null) return "Unknown";
-        switch (type.toUpperCase()) {
+        switch (type.trim().toUpperCase()) {
             case "SQL_INJECTION": return "SQL Injection";
             case "XSS": return "Cross-Site Scripting";
             case "PATH_TRAVERSAL": return "Path Traversal";
             case "BRUTE_FORCE": return "Brute Force";
+            case "COMMAND_INJECTION": return "Command Injection";
             case "MALICIOUS_UPLOAD":
             case "MALICIOUS_FILE_UPLOAD": return "Malicious Upload";
             case "UNKNOWN": return "Unknown";
-            default: return type;
+            default: return type.trim();
         }
     }
 
@@ -38,10 +39,18 @@ public class AnalyticsService {
         for (Object[] row : attackLogRepository.countAttacksByType()) {
             String rawType = (String) row[0];
             Long count = (Long) row[1];
-            String formattedType = formatAttackType(rawType);
-            aggregated.put(formattedType, aggregated.getOrDefault(formattedType, 0L) + count);
+            // A single DB row may have a comma-separated multi-attack string; split and count each
+            if (rawType != null && rawType.contains(",")) {
+                for (String part : rawType.split(",\\s*")) {
+                    String formatted = formatAttackType(part);
+                    aggregated.put(formatted, aggregated.getOrDefault(formatted, 0L) + count);
+                }
+            } else {
+                String formattedType = formatAttackType(rawType);
+                aggregated.put(formattedType, aggregated.getOrDefault(formattedType, 0L) + count);
+            }
         }
-        
+
         List<Map<String, Object>> result = new ArrayList<>();
         for (Map.Entry<String, Long> entry : aggregated.entrySet()) {
             Map<String, Object> map = new LinkedHashMap<>();
@@ -82,7 +91,11 @@ public class AnalyticsService {
             map.put("id", log.getId());
             map.put("timestamp", log.getTimestamp());
             map.put("ipAddress", log.getIpAddress());
-            map.put("attackType", formatAttackType(log.getAttackType()));
+            map.put("attackType", log.getAttackType() != null
+                    ? String.join(", ", java.util.Arrays.stream(log.getAttackType().split(",\\s*"))
+                        .map(this::formatAttackType)
+                        .toArray(String[]::new))
+                    : "Unknown");
             map.put("endpoint", log.getEndpoint());
             map.put("country", log.getCountry());
             map.put("city", log.getCity());
